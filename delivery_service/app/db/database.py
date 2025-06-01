@@ -4,7 +4,7 @@ from app.config import settings
 
 # 1) Обычный (синхронный) engine
 engine = create_engine(
-    settings.DATABASE_URL,    # например: postgresql+psycopg2://user:pass@localhost/dbname
+    settings.DELIVERY_DATABASE_URL,    # например: postgresql+psycopg2://user:pass@localhost/dbname
     echo=True,
 )
 

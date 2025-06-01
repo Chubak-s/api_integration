@@ -1,6 +1,6 @@
 version: '3.8'
 services:
-  db:
+  delivery_db:
     image: postgres:15
     restart: always
     environment:
@@ -24,15 +24,15 @@ services:
     volumes:
       - ./pgdata_restaurant:/var/lib/postgresql/data
 
-  api:
+  delivery-api:
     build: ./delivery_service
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000
     ports:
       - "8000:8000"
     environment:
-      DATABASE_URL: postgresql+psycopg2://delivery_user:delivery_pass@db/delivery_db
+      DELIVERY_DATABASE_URL: postgresql+psycopg2://delivery_user:delivery_pass@delivery_db/delivery_db
     depends_on:
-      - db
+      - delivery_db
 
   restaurant-api:
     build: ./restaurant_service

@@ -1,7 +1,7 @@
 import requests
 
 def notify_delivery_ready(order_id: int) -> bool:
-    delivery_url = f"http://api:8000/orders/{order_id}/ready-for-delivery"
+    delivery_url = f"http://delivery-api:8000/orders/{order_id}/ready-for-delivery"
     try:
         resp = requests.post(delivery_url)
         resp.raise_for_status()
@@ -11,7 +11,7 @@ def notify_delivery_ready(order_id: int) -> bool:
         return False
 
 def notify_start_delivery(order_id: int) -> bool:
-    delivery_url = f"http://api:8000/orders/{order_id}/start-delivery"
+    delivery_url = f"http://delivery-api:8000/orders/{order_id}/start-delivery"
     try:
         resp = requests.post(delivery_url)
         resp.raise_for_status()
@@ -21,7 +21,7 @@ def notify_start_delivery(order_id: int) -> bool:
         return False
 
 def notify_cancel(order_id: int) -> bool:
-    delivery_url = f"http://api:8000/orders/{order_id}/cancel"
+    delivery_url = f"http://delivery-api:8000/orders/{order_id}/cancel"
     try:
         resp = requests.post(delivery_url)
         resp.raise_for_status()
