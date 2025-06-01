@@ -1,0 +1,25 @@
+# Core
+fastapi==0.95.1
+uvicorn[standard]==0.23.1
+
+# ORM и миграции
+SQLAlchemy==2.0.20
+alembic==1.11.1
+asyncpg==0.28.0
+
+# Валидация и .env
+pydantic==1.10.12
+python-dotenv==1.0.0
+
+# HTTP-клиент для интеграций
+httpx==0.24.0
+
+# Тестирование
+pytest==7.4.0
+pytest-asyncio==0.22.0
+
+fastapi
+uvicorn
+sqlalchemy
+psycopg2
+requests

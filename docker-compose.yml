@@ -1,0 +1,45 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_DB: delivery_db
+      POSTGRES_USER: delivery_user
+      POSTGRES_PASSWORD: delivery_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+
+  restaurant_db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_DB: restaurant_db
+      POSTGRES_USER: restaurant_user
+      POSTGRES_PASSWORD: restaurant_pass
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./pgdata_restaurant:/var/lib/postgresql/data
+
+  api:
+    build: ./delivery_service
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql+psycopg2://delivery_user:delivery_pass@db/delivery_db
+    depends_on:
+      - db
+
+  restaurant-api:
+    build: ./restaurant_service
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    ports:
+      - "8001:8000"
+    environment:
+      RESTAURANT_DATABASE_URL: postgresql+psycopg2://restaurant_user:restaurant_pass@restaurant_db/restaurant_db
+    depends_on:
+      - restaurant_db
