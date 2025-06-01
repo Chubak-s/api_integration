@@ -35,9 +35,11 @@ class OrderBase(BaseModel):
 
 class OrderCreate(OrderBase):
     items: List[OrderItemCreate]
+    delivery_order_id: Optional[int] = None
 
 class OrderOut(OrderBase):
     id: int
+    delivery_order_id: Optional[int] = None
     status: str
     items: List[OrderItemOut] = Field(..., alias="order_items")
     created_at: datetime.datetime

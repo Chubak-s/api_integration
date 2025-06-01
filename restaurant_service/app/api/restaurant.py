@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.db.restaurant import get_session
 from app.schemas.restaurant import OrderCreate, OrderOut, MenuItemOut, OrderResponse
+from app.integration.delivery_client import notify_delivery_ready, notify_start_delivery, notify_cancel
 from app.crud.restaurant import (
     add_order_to_db,
     get_order_from_db,
@@ -31,16 +32,36 @@ def get_order(id: int, db: Session = Depends(get_session)):
         raise HTTPException(status_code=404, detail="Order not found")
     return order
 
+@router.post("/orders/{id}/ready-for-delivery", response_model=OrderOut)
+def ready_for_delivery(id: int, db: Session = Depends(get_session)):
+    order = update_order_status_in_db(id, "READY_FOR_DELIVERY", db)
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    if not notify_delivery_ready(order.delivery_order_id):
+        raise HTTPException(status_code=502, detail="Failed to update delivery status in delivery service")
+    return order
+
+@router.post("/orders/{id}/start-delivery", response_model=OrderOut)
+def start_delivery(id: int, db: Session = Depends(get_session)):
+    order = update_order_status_in_db(id, "IN_DELIVERY", db)
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    if not notify_start_delivery(order.delivery_order_id):
+        raise HTTPException(status_code=502, detail="Failed to update delivery status in delivery service")
+    return order
+    
 @router.post("/orders/{id}/finish", response_model=OrderOut)
 def finish_order(id: int, db: Session = Depends(get_session)):
-    order = update_order_status_in_db(id, "delivered", db)
+    order = update_order_status_in_db(id, "DELIVERED", db)
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
     return order
 
 @router.post("/orders/{id}/cancel", response_model=OrderOut)
 def cancel_order(id: int, db: Session = Depends(get_session)):
-    order = update_order_status_in_db(id, "cancelled", db)
+    order = update_order_status_in_db(id, "CANCELLED", db)
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
+    if not notify_cancel(order.delivery_order_id):
+        raise HTTPException(status_code=502, detail="Failed to update delivery status in delivery service")
     return order

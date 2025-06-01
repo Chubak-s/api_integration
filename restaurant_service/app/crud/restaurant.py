@@ -7,6 +7,7 @@ def add_order_to_db(order_data, db: Session):
     order = Order(
         customer_name=order_data.customer_name,
         customer_address=order_data.customer_address,
+        delivery_order_id=order_data.delivery_order_id,
         status="created",
     )
     db.add(order)

@@ -7,7 +7,7 @@ Base = declarative_base()
 
 class OrderStatus(enum.Enum):
     ACCEPTED = "ACCEPTED"
-    PREPARING = "PREPARING"
+    READY_FOR_DELIVERY = "READY_FOR_DELIVERY"
     IN_DELIVERY = "IN_DELIVERY"
     DELIVERED = "DELIVERED"
     CANCELLED = "CANCELLED"

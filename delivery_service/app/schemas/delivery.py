@@ -6,7 +6,7 @@ import datetime
 # 1. Enum статусов заказа (OrderStatus)
 class OrderStatus(str, Enum):
     ACCEPTED = "ACCEPTED"
-    PREPARING = "PREPARING"
+    READY_FOR_DELIVERY = "READY_FOR_DELIVERY"
     IN_DELIVERY = "IN_DELIVERY"
     DELIVERED = "DELIVERED"
     CANCELLED = "CANCELLED"

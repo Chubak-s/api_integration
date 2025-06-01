@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from app.db.database import get_session
 from app.models.delivery import OrderStatus
 from app.schemas.delivery import OrderCreate, OrderOut
+from app.integration.restaurant_client import notify_finish_delivery
 from app.services.delivery_service import (
     create_order_service,
     get_order_service,
@@ -49,7 +50,7 @@ def get_order(order_id: int, db: Session = Depends(get_session)):
 # 4. Заказ готов к доставке
 @router.post("/orders/{order_id}/ready-for-delivery", response_model=OrderOut)
 def ready_for_delivery(order_id: int, db: Session = Depends(get_session)):
-    order = set_order_status_service(order_id, OrderStatus.PREPARING, db)
+    order = set_order_status_service(order_id, OrderStatus.READY_FOR_DELIVERY.value, db)
     if not order:
         raise HTTPException(status_code=404, detail="Заказ не найден")
     return order
@@ -58,16 +59,25 @@ def ready_for_delivery(order_id: int, db: Session = Depends(get_session)):
 # 5. Заказ передан в доставку (статус "В пути")
 @router.post("/orders/{order_id}/start-delivery", response_model=OrderOut)
 def start_delivery(order_id: int, db: Session = Depends(get_session)):
-    order = set_order_status_service(order_id, OrderStatus.IN_DELIVERY, db)
+    order = set_order_status_service(order_id, OrderStatus.IN_DELIVERY.value, db)
     if not order:
         raise HTTPException(status_code=404, detail="Заказ не найден")
     return order
 
+# 6. Заказ доставлен (статус "завершен")
+@router.post("/orders/{order_id}/finish", response_model=OrderOut)
+def finish_order(order_id: int, db: Session = Depends(get_session)):
+    order = set_order_status_service(order_id, OrderStatus.DELIVERED.value, db)
+    if not order:
+        raise HTTPException(status_code=404, detail="Заказ не найден")
+    if not notify_finish_delivery(order.restaurant_order_id, order.restaurant_id):
+        raise HTTPException(status_code=502, detail="Failed to update delivery status in delivery service")
+    return order
 
-# 6. Отмена заказа
+# 7. Отмена заказа
 @router.post("/orders/{order_id}/cancel", response_model=OrderOut)
 def cancel_order(order_id: int, db: Session = Depends(get_session)):
-    order = set_order_status_service(order_id, OrderStatus.CANCELLED, db)
+    order = set_order_status_service(order_id, OrderStatus.CANCELLED.value, db)
     if not order:
         raise HTTPException(status_code=404, detail="Заказ не найден")
     return order
