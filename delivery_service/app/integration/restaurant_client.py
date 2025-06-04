@@ -29,3 +29,12 @@ def notify_finish_delivery(restaurant_order_id, restaurant_id):
     if response.status_code == 200:
         return response.json()
     return None
+
+def notify_restaurant_assign_courier(restaurant_order_id, courier, restaurant_id):
+    base_url = get_restaurant_url(restaurant_id)
+    payload = {
+        "name": courier.name,
+        "phone": courier.phone
+    }
+    response = requests.post(f"{base_url}/orders/{restaurant_order_id}/assign-courier", json=payload)
+    return response

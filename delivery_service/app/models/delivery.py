@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Enum, ForeignKey, DateTime
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
 from sqlalchemy.orm import relationship, declarative_base
 import enum
 import datetime
@@ -18,6 +18,7 @@ class Courier(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
     phone = Column(String, nullable=True)
+    is_busy = Column(String, nullable=True)
 
     orders = relationship("Order", back_populates="courier")
 

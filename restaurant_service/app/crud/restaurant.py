@@ -1,4 +1,4 @@
-from app.models.restaurant import Order, OrderItem, MenuItem
+from app.models.restaurant import Order, OrderItem, MenuItem, Courier
 from sqlalchemy.orm import Session
 from typing import List
 
@@ -45,3 +45,13 @@ def update_order_status_in_db(order_id: int, new_status: str, db: Session):
 
 def get_menu_from_db(db: Session) -> List[MenuItem]:
     return db.query(MenuItem).all()
+
+def get_order_by_id(db, order_id: int):
+    return db.query(Order).filter(Order.id == order_id).first()
+
+def create_courier_for_order(db, order_id: int, name: str, phone: str):
+    courier = Courier(name=name, phone=phone, order_id=order_id)
+    db.add(courier)
+    db.commit()
+    db.refresh(courier)
+    return courier

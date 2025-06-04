@@ -9,6 +9,7 @@ from app.crud.restaurant import (
     update_order_status_in_db,
     get_menu_from_db
 )
+from app.services.restaurant_service import assign_courier_service
 from typing import List
 
 router = APIRouter()
@@ -65,3 +66,10 @@ def cancel_order(id: int, db: Session = Depends(get_session)):
     if not notify_cancel(order.delivery_order_id):
         raise HTTPException(status_code=502, detail="Failed to update delivery status in delivery service")
     return order
+
+@router.post("/orders/{id}/assign-courier")
+def assign_courier(id: int, courier_data: dict, db: Session = Depends(get_session)):
+    courier, error = assign_courier_service(id, courier_data, db)
+    if error:
+        raise HTTPException(status_code=404, detail=error)
+    return {"result": "Курьер сохранён", "courier_id": courier.id}

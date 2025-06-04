@@ -2,6 +2,13 @@ from pydantic import BaseModel, Field
 from typing import List, Optional
 import datetime
 
+class CourierOut(BaseModel):
+    id: int
+    name: str
+    phone: Optional[str]
+
+    class Config:
+        orm_mode = True
 
 class MenuItemBase(BaseModel):
     name: str
@@ -44,6 +51,7 @@ class OrderOut(OrderBase):
     items: List[OrderItemOut] = Field(..., alias="order_items")
     created_at: datetime.datetime
     updated_at: datetime.datetime
+    courier: Optional[CourierOut] = None
 
     class Config:
         orm_mode = True

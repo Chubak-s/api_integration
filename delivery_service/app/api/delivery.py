@@ -8,7 +8,8 @@ from app.services.delivery_service import (
     create_order_service,
     get_order_service,
     set_order_status_service,
-    get_restaurant_menu_service
+    get_restaurant_menu_service,
+    assign_courier_service
 )
 
 router = APIRouter(prefix="", tags=[""])
@@ -81,3 +82,14 @@ def cancel_order(order_id: int, db: Session = Depends(get_session)):
     if not order:
         raise HTTPException(status_code=404, detail="Заказ не найден")
     return order
+
+# 8. Назначение курьера
+@router.post("/orders/{order_id}/assign-courier")
+def assign_courier(order_id: int, db: Session = Depends(get_session)):
+    courier, error = assign_courier_service(order_id, db)
+    if error:
+        if error == "Нет свободных курьеров":
+            raise HTTPException(status_code=400, detail=error)
+        else:
+            raise HTTPException(status_code=404, detail=error)
+    return {"result": "Курьер назначен", "courier_id": courier.id}
